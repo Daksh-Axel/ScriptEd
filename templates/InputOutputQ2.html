@@ -1,0 +1,20 @@
+{% extends "base.html" %} {% block title %}App 1{% endblock %} {% block content
+	%}
+	<br />
+	<h1 align="center">To-do List</h1>	
+	<br />
+	<form name="my_form" >
+		Enter date (YYYY-MM-DD) &nbsp;<input  type="text" name="date"><br>
+		Enter work &nbsp;<input  type="text" name="work"><br>
+		Enter time of work in 24 hour format (eg:1350 for 1:50pm) &nbsp;<input  type="text" name="time"><br>
+		Would you like to continue ? &nbsp;<input  type="text" name="yn"><br>
+		<input type="button" class="btn btn-info" onclick="submitData('/submitJSON2')" value="Submit">	
+	</form>	
+	
+	<div class="row">
+    			<div class="col-md-8" align="left" style="float:left; margin-top: 0.45cm;" id="output_div">
+    			</div>
+    	</div>			
+</body>
+</html>
+	{% endblock %}
