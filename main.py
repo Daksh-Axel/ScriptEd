@@ -158,7 +158,33 @@ def processJSON3():
 
 
 @app.route('/weather',methods=['POST','GET'])
-#<weather code goes here>
+def weather():
+    if request.method == 'POST':
+            city = request.form['city']
+    else:
+        # for default name mathura
+            city = 'Raipur'
+
+    # your API key will come here
+    
+    # source contain json data from api
+    source = urllib.request.urlopen('http://api.openweathermap.org/data/2.5/weather?q='+city+'&APPID=32ccbc36dd38bd11edfcf2606480566d').read()
+
+    # converting JSON data to a dictionary
+    list_of_data = json.loads(source)
+
+    # data for variable list_of_data
+    data = {
+        country_code: str(list_of_data['sys']['country']),
+        cityname:str(city),
+        coordinate: str(list_of_data['coord']['lat']) + ' , '
+                    + str(list_of_data['coord']['lon']),
+        temp: str(list_of_data['main']['temp']) + ' K',
+        pressure: str(list_of_data['main']['pressure']) + ' HPa',
+        humidity: str(list_of_data['main']['humidity']) + '%',
+    }
+    print(data)
+    return render_template('InputOutputQ3.html', data = data)
 
 if __name__ == "__main__":
     app.run(debug=True)
