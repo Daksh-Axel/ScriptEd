@@ -1,3 +1,4 @@
+
 #import statement
 
 import json
@@ -13,6 +14,8 @@ import urllib.request
 t_list={}
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+
+
 
 @app.route("/")
 def home():
@@ -52,8 +55,9 @@ def processJSON1():
     email()
     
     return 'Done'
-    
-    
+
+
+
 @app.route("/submitJSON2", methods=["POST"])
 def processJSON2():
     jsonStr = request.get_json()
@@ -114,5 +118,49 @@ def processJSON2():
         write.writerows(export_data)
    
     return response
+
+@app.route("/submitJSON3", methods=["POST"])
+def processJSON3():
+    jsonStr = request.get_json()
+    jsonObj = json.loads(jsonStr) 
+    
+    city = jsonObj['city']
+    def weather():
+            if request.method == 'POST':
+                city = request.form['city']
+                if len(city)<1:
+                    flash("Please enter the name of the city", category='error')
+            else:
+                # for default name mathura
+                city = 'Raipur'
+
+    # your API key will come here
+
+
+    # source contain json data from api
+    source = urllib.request.urlopen('http://api.openweathermap.org/data/2.5/weather?q='+city+'&APPID=32ccbc36dd38bd11edfcf2606480566d').read()
+
+    # converting JSON data to a dictionary
+    list_of_data = json.loads(source)
+
+    # data for variable list_of_data
+    data = {
+            "country_code": str(list_of_data['sys']['country']),
+            "cityname":str(city),
+            "coordinate": str(list_of_data['coord']['lat']) + ' , '
+                        + str(list_of_data['coord']['lon']),
+            "temp": str(list_of_data['main']['temp']) + 'k',
+            "pressure": str(list_of_data['main']['pressure']),
+            "humidity": str(list_of_data['main']['humidity']),
+        }
+    print(data)
+    return render_template('InputOutputQ3.html', data = data)
+
+
+@app.route('/weather',methods=['POST','GET'])
+#<weather code goes here>
+
+if __name__ == "__main__":
+    app.run(debug=True)
 
 
