@@ -1,8 +1,11 @@
 #import statement
 
-
+import json
+import csv
+from csv import DictWriter
 from flask import Flask, render_template, request, jsonify , flash
 from flask_cors import cross_origin
+import pyttsx3
 from itertools import zip_longest
 import datetime
 import smtplib, ssl
@@ -49,5 +52,67 @@ def processJSON1():
     email()
     
     return 'Done'
+    
+    
+@app.route("/submitJSON2", methods=["POST"])
+def processJSON2():
+    jsonStr = request.get_json()
+    jsonObj = json.loads(jsonStr) 
+    
+    response = ""
+    date=jsonObj['date']
+    work=jsonObj['work']
+    time=jsonObj['time']
+    option=jsonObj['yn']
+
+    def text_to_speech(text, gender):
+        voice_dict = {'Male': 0, 'Female': 1}
+        code = voice_dict[gender]
+        engine = pyttsx3.init()
+        engine.setProperty('rate', 100)
+        engine.setProperty('volume', 1.0)
+        engine.say(text)
+        engine.runAndWait()
+            
+    if date not in t_list.keys():
+        t_list[date]=[]
+        t_list[date].append([work,time])
+        text_to_speech('New date along with work to be done has been added','Female')
+    else:
+        t_list[date].append([work,time])   
+        text_to_speech('Work has been added','Female')
+        
+    if option[0]=='n':
+        text_to_speech('Thank You, your data has been stored','Female')
+    else:
+        text_to_speech('Please make more entries','Female')
+        
+    data=[]
+    name=[' ']
+    work={}
+    times={}
+   
+    for key in t_list:
+        work[key]=[]
+        times[key]=[]
+        for i in range(len(t_list[key])):
+            work[key].append(t_list[key][i][0])
+            times[key].append(t_list[key][i][1])
+    
+    
+    for key in t_list:
+        data.append(times[key])       
+        data.append(work[key])
+        data.append(' ')
+        name.append(key)
+        name.append(' ')
+        name.append(' ')
+        export_data = zip_longest(*data, fillvalue = '')
+    with open('Data.csv', 'w', encoding="ISO-8859-1", newline='') as file:
+        write = csv.writer(file)
+        write.writerow(tuple(name))
+        write.writerows(export_data)
+   
+    return response
 
 
