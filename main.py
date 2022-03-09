@@ -184,7 +184,7 @@ def weather():
         humidity: str(list_of_data['main']['humidity']) + '%',
     }
     print(data)
-    return render_template('InputOutputQ3.html', data = data)
+    return render_template('weather.html', data = data)
 
 if __name__ == "__main__":
     app.run(debug=True)
