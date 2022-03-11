@@ -153,7 +153,7 @@ def processJSON3():
             "pressure": str(list_of_data['main']['pressure']),
             "humidity": str(list_of_data['main']['humidity']),
         }
-    print(data)
+   # print(data)
     return render_template('InputOutputQ3.html', data = data)
 
 
@@ -183,7 +183,7 @@ def weather():
         "pressure": str(list_of_data['main']['pressure']) + ' HPa',
         "humidity": str(list_of_data['main']['humidity']) + '%',
     }
-    print(data)
+   # print(data)
     return render_template('weather.html', data = data)
 
 if __name__ == "__main__":
