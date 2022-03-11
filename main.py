@@ -1,19 +1,58 @@
-
-#import statement
-
 import json
 import csv
 from csv import DictWriter
-from flask import Flask, render_template, request, jsonify , flash
+from flask import Flask, render_template, request, jsonify , flash, redirect
 from flask_cors import cross_origin
 import pyttsx3
 from itertools import zip_longest
 import datetime
 import smtplib, ssl
 import urllib.request
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+
+
 t_list={}
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///todo.db"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+class Todo(db.Model):
+    sno = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    desc = db.Column(db.String(500), nullable=False)
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self) -> str:
+        return f"{self.sno} - {self.title}"
+
+@app.route('/todo', methods=['GET', 'POST'])
+def hello_world():
+	if request.method=='POST':
+		title = request.form['title']
+		desc = request.form['desc']
+		todo = Todo(title=title, desc=desc)
+		db.session.add(todo)
+		db.session.commit()
+	allTodo = Todo.query.all() 
+	return render_template('todo.html', allTodo=allTodo)
+
+@app.route('/todo/show')
+def products():
+    allTodo = Todo.query.all()
+    print(allTodo)
+    return 'this is products page'
+
+@app.route('/todo/delete/<int:sno>')
+def delete(sno):
+    todo = Todo.query.filter_by(sno=sno).first()
+    db.session.delete(todo)
+    db.session.commit()
+    return redirect("/todo")
+
 
 
 
@@ -21,12 +60,12 @@ app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 def home():
     return render_template("home.html")
 
+
 @app.route('/email')
-def email_render():
-    return render_template("email.html")
-@app.route('/todo_list')
-def todo_list_render():
-    return render_template("todo.html")
+def problem1():
+    return render_template("InputOutputQ1.html")
+
+
 
 
 
@@ -37,15 +76,11 @@ def processJSON1():
     jsonObj = json.loads(jsonStr) 
     
     response = ""
-    
-    # to be followe in template of web page 
     s_email=jsonObj['s_email']
     passw=jsonObj['passw']
     r_email=jsonObj['r_email']
     mess=jsonObj['mess']
     
-    
-    #support for only gmail
     def email():
         port = 465 
         context = ssl.create_default_context()
@@ -54,70 +89,8 @@ def processJSON1():
             server.sendmail(s_email, r_email, mess)
     email()
     
-    return 'Done'
+    return 'Done' 
 
-
-
-@app.route("/submitJSON2", methods=["POST"])
-def processJSON2():
-    jsonStr = request.get_json()
-    jsonObj = json.loads(jsonStr) 
-    
-    response = ""
-    date=jsonObj['date']
-    work=jsonObj['work']
-    time=jsonObj['time']
-    option=jsonObj['yn']
-
-    def text_to_speech(text, gender):
-        voice_dict = {'Male': 0, 'Female': 1}
-        code = voice_dict[gender]
-        engine = pyttsx3.init()
-        engine.setProperty('rate', 100)
-        engine.setProperty('volume', 1.0)
-        engine.say(text)
-        engine.runAndWait()
-            
-    if date not in t_list.keys():
-        t_list[date]=[]
-        t_list[date].append([work,time])
-        text_to_speech('New date along with work to be done has been added','Female')
-    else:
-        t_list[date].append([work,time])   
-        text_to_speech('Work has been added','Female')
-        
-    if option[0]=='n':
-        text_to_speech('Thank You, your data has been stored','Female')
-    else:
-        text_to_speech('Please make more entries','Female')
-        
-    data=[]
-    name=[' ']
-    work={}
-    times={}
-   
-    for key in t_list:
-        work[key]=[]
-        times[key]=[]
-        for i in range(len(t_list[key])):
-            work[key].append(t_list[key][i][0])
-            times[key].append(t_list[key][i][1])
-    
-    
-    for key in t_list:
-        data.append(times[key])       
-        data.append(work[key])
-        data.append(' ')
-        name.append(key)
-        name.append(' ')
-        name.append(' ')
-        export_data = zip_longest(*data, fillvalue = '')
-    with open('Data.csv', 'w', encoding="ISO-8859-1", newline='') as file:
-        write = csv.writer(file)
-        write.writerow(tuple(name))
-        write.writerows(export_data)
-   
-    return response
 
 @app.route("/submitJSON3", methods=["POST"])
 def processJSON3():
@@ -153,7 +126,7 @@ def processJSON3():
             "pressure": str(list_of_data['main']['pressure']),
             "humidity": str(list_of_data['main']['humidity']),
         }
-   # print(data)
+    print(data)
     return render_template('InputOutputQ3.html', data = data)
 
 
@@ -177,14 +150,16 @@ def weather():
     data = {
         "country_code": str(list_of_data['sys']['country']),
         "cityname":str(city),
-        "coordinate": str(list_of_data['coord']['lat']) + ' , '
-                    + str(list_of_data['coord']['lon']),
-        "temp": str(list_of_data['main']['temp']) + ' K',
+        "coordinate": str(list_of_data['coord']['lat']) + ' °,'
+                    + str(list_of_data['coord']['lon'])+' °',
+        "temp": str(round(list_of_data['main']['temp']-273, 2)) + " °C",
         "pressure": str(list_of_data['main']['pressure']) + ' HPa',
         "humidity": str(list_of_data['main']['humidity']) + '%',
     }
-   # print(data)
-    return render_template('weather.html', data = data)
+    print(data)
+    return render_template('InputOutputQ3.html', data = data)
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

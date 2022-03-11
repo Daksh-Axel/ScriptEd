@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8" />
@@ -30,12 +30,13 @@
         <span class="navbar-brand mb-0 h1">Personal Assistant</span>
       <div class="collapse navbar-collapse" id="navbar">
         <div class="navbar-nav">
-            <a class="nav-item nav-link" id="home" href="/todo_list">To-do List</a>
+        <a class="nav-item nav-link" id="home" href="/todo">To-do list</a>
             <a class="nav-item nav-link" id="home" href="/email">Emailing Service</a>
             <a class="nav-item nav-link" id="home" href="/weather">Weather Tracker</a>
         </div>
       </div>
     </nav>
+
     {% with messages = get_flashed_messages(with_categories=true) %} {% if
     messages %} {% for category, message in messages %} {% if category ==
     'error' %}
