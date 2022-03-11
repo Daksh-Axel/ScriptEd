@@ -175,13 +175,13 @@ def weather():
 
     # data for variable list_of_data
     data = {
-        country_code: str(list_of_data['sys']['country']),
-        cityname:str(city),
-        coordinate: str(list_of_data['coord']['lat']) + ' , '
+        "country_code": str(list_of_data['sys']['country']),
+        "cityname":str(city),
+        "coordinate": str(list_of_data['coord']['lat']) + ' , '
                     + str(list_of_data['coord']['lon']),
-        temp: str(list_of_data['main']['temp']) + ' K',
-        pressure: str(list_of_data['main']['pressure']) + ' HPa',
-        humidity: str(list_of_data['main']['humidity']) + '%',
+        "temp": str(list_of_data['main']['temp']) + ' K',
+        "pressure": str(list_of_data['main']['pressure']) + ' HPa',
+        "humidity": str(list_of_data['main']['humidity']) + '%',
     }
     print(data)
     return render_template('weather.html', data = data)
